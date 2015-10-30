@@ -57,7 +57,7 @@ menu_icons:
 # ---------------------------------------------------------------
 
 # Schemes
-#scheme: Mist
+# scheme: Mist
 
 
 
@@ -71,7 +71,7 @@ menu_icons:
 #  - always  expand for all pages automatically
 #  - hide    expand only when click on the sidebar toggle icon.
 #  - remove  Totally remove sidebar including sidebar toggle icon.
-sidebar: post
+sidebar: remove
 #sidebar: always
 #sidebar: hide
 #sidebar: remove
