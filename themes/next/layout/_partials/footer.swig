@@ -7,5 +7,8 @@
   </span>
   <span class="author" itemprop="copyrightHolder">{{ config.author }}</span>
 </div>
+<div class="disclaimer">
+  All Rights Reserved.
+</div>
 
 {% block footer %}{% endblock %}
