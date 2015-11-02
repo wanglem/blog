@@ -68,5 +68,10 @@ theme: next
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
 deploy:
-  type: git
+- type: git
   repo: https://github.com/wanglem/blog.git
+- type: rsync
+  host: blog
+  user: ec2-user
+  root: /usr/local/blog
+  port: 22
