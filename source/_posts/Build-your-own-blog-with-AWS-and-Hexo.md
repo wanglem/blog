@@ -1,6 +1,11 @@
 title: Build your own blog with AWS and Hexo
 date: 2015-11-02 15:25:15
-tags: website, aws, ec2, hexo, blog
+tags: 
+	- website
+	- aws
+	- ec2
+	- hexo
+	- blog
 ---
 
 Before start, I should really say this is not the best way to create a blog. There are other easy ways, or more powerful ways. This is just me trying something new, and most importantly, have fun.
