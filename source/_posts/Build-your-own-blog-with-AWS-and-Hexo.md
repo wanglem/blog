@@ -101,7 +101,7 @@ deploy:
   port: 22
 ```
 
-With that, when you run `hexo release` it will publish generated static files to the EC2 instance. Note the attribute `host: blog` was created in your ~/.ssh/config already.
+With that, when you run `hexo deploy` it will publish generated static files to the EC2 instance. Note the attribute `host: blog` was created in your ~/.ssh/config already.
 
 You can also checkout my Github page to view my configuration: https://github.com/wanglem/blog.
 
