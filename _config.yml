@@ -75,3 +75,6 @@ deploy:
   user: ec2-user
   root: /usr/local/blog
   port: 22
+
+tag_generator:
+  per_page: 10
