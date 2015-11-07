@@ -7,6 +7,7 @@ Hosted by GitHub for some custom adjustments.
 
 TODOs:
 - [X] Quick About page
+- [X] Add favicon
 - [ ] Show preview posts on Home page
 - [ ] Clould Tag page setup
 - [ ] Google Analytics
