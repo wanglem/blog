@@ -21,6 +21,7 @@ If you find your preferable doamin with `.com` suffix is not available, try `.ne
 After you got it, you can go to the manage page, and set "Forwarding" to your facebook page or twitter page, just for fun.
 
 # Setup Your AWS EC2
+<!-- more -->
 ## Create An EC2 Instance
 If you know how to launch a EC2 instance, feel free to skip this section. Continue if you don't.
 
