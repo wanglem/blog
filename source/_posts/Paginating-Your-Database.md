@@ -58,8 +58,7 @@ Interestingly, the query time starts staying consistent when pacing towards the 
 
 
 Besides the obvious slowness issue, another major one is we might encounter data loss. For example, just before we load page 2 by running `limit 100, 100`, user "5" suddenly deleted, user "100" would be shifted to page 1, bad bad:
-{% asset_img data_loss_offset.png Data Loss from Hard Offsets%}
-
+{% img /2015/11/13/Paginating-Your-Database/data_loss_offset.png 500  "Data Loss from Hard Offsets"%}
 ## Improved Approach:
 ```sql Improved
 SELECT distinct uid 
@@ -125,7 +124,7 @@ admin [tmp]>explain select topic_id from followed_topics where uid = 100 and cre
 +------+-------------+-----------------+------+--------------------------------+----------------+---------+-------+------+-----------------------------+
 | id   | select_type | table           | type | possible_keys                  | key            | key_len | ref   | rows | Extra                       |
 +------+-------------+-----------------+------+--------------------------------+----------------+---------+-------+------+-----------------------------+
-|    1 | SIMPLE      | followed_topics | ref  | uq_author_book,idx_created_on  | uq_author_book | 4       | const | 1999 | Using where; Using filesort |
+|    1 | SIMPLE      | followed_topics | ref  | uq_follow_topc,idx_created_on  | uq_follow_topc | 4       | const | 1999 | Using where; Using filesort |
 +------+-------------+-----------------+------+--------------------------------+----------------+---------+-------+------+-----------------------------+
 1 row in set (0.01 sec)
 1 row in set (0.00 sec)```
@@ -135,8 +134,7 @@ From SQL explain result above, it's not a bad query at all. I'm a little suprise
 Note: Interestingly, filesort does not necessarily mean sort on disk, it more of any sort that is not using an index, and essentially by quicksort and mergesort. I guess it's just poorly named. See more in this [**article**](http://s.petrunia.net/blog/?p=24).
 
 Okay, so far so good. If we are working with a high volume of events, however, we could still encounter data loss. The reason is `created_on`, which is the timestamp field, is not unique. Therefore multiple followed topics with same created_on might be trunated from limit clause:
-{% asset_img data_loss_nonunique_ts.png Data Loss from Non-unique Timestamp  %}
-
+{% img /2015/11/13/Paginating-Your-Database/data_loss_nonunique_ts.png 500  "Data Loss from Non-unique Timestamp"%}
 ## Filter by ID for more Uniqueness
 How about using PK(id) field? If we rely on the implication that the higher ID the closer created_on, we will have:
 
@@ -150,13 +148,13 @@ LIMIT 10;
 ...
 ```
 
-In this case we want to use id to filter as well as sorting, as it can using same key on all filters:
+In this case we want to use id to filter as well as sorting, apply all filters on same key, which is `uq_follow_topc`, and would not apply further lookups  see below sql explain:
 ```sql Using index V.S. Using index condition
 admin [tmp]>explain SELECT topic_id FROM followed_topics WHERE uid = 100 and id < 1000000 ORDER BY id desc LIMIT 10;
 +------+-------------+-----------------+------+------------------------+----------------+---------+-------+------+------------------------------------------+
 | id   | select_type | table           | type | possible_keys          | key            | key_len | ref   | rows | Extra                                    |
 +------+-------------+-----------------+------+------------------------+----------------+---------+-------+------+------------------------------------------+
-|    1 | SIMPLE      | followed_topics | ref  | PRIMARY,uq_author_book | uq_author_book | 4       | const | 1999 | Using where; Using index; Using filesort |
+|    1 | SIMPLE      | followed_topics | ref  | PRIMARY,uq_follow_topc | uq_follow_topc | 4       | const | 1999 | Using where; Using index; Using filesort |
 +------+-------------+-----------------+------+------------------------+----------------+---------+-------+------+------------------------------------------+
 1 row in set (0.00 sec)
 
@@ -164,7 +162,34 @@ admin [tmp]>explain SELECT topic_id FROM followed_topics WHERE uid = 100 and id 
 +------+-------------+-----------------+------+------------------------+----------------+---------+-------+------+----------------------------------------------------+
 | id   | select_type | table           | type | possible_keys          | key            | key_len | ref   | rows | Extra                                              |
 +------+-------------+-----------------+------+------------------------+----------------+---------+-------+------+----------------------------------------------------+
-|    1 | SIMPLE      | followed_topics | ref  | PRIMARY,uq_author_book | uq_author_book | 4       | const | 1999 | Using index condition; Using where; Using filesort |
+|    1 | SIMPLE      | followed_topics | ref  | PRIMARY,uq_follow_topc | uq_follow_topc | 4       | const | 1999 | Using index condition; Using where; Using filesort |
 +------+-------------+-----------------+------+------------------------+----------------+---------+-------+------+----------------------------------------------------+
 1 row in set (0.00 sec)
+```
+
+## Paging Inside a Pagination
+In a feed/timeline application, users would be likely to refresh page occasionally trying to pull latest posts, and scrolling all the way down to where they left off. Consider the following scenario:
+{% img /2015/11/13/Paginating-Your-Database/paging_in_pagination.png 300  "Duplicate Computation"%}
+
+As showing above, 1st request pulls down topic 5 - 1, and then topic 11 - 6 are generated; Then 2st request to pull latest 5 topics, which are 11 - 7; Then a 3rd request to continue pulling 6 - 2, with 3 overlapped topics re-computed.
+
+For best resource utilization, we want to implement an exactly-once mechanism by keep tracking of lastest id(`%%latest_seen_id%%`) before each latest pull request. Consider the following sql:
+```sql Using latest_seen_id macro
+SELECT topic_id 
+FROM followed_topics 
+WHERE uid = %%current_user%% 
+	  and id < %%last_seen_id%% 
+	  and id > %%latest_seen_id%%
+ORDER BY id desc 
+LIMIT 10;
+```
+Now we should be able to eliminate data re-computation. Back to the previous example, 3rd request now looks like:
+```sql 
+SELECT topic_id 
+FROM followed_topics 
+WHERE uid = [user_id]
+	  and id < [id_of_topic7]
+	  and id > [id_of_topic5]
+ORDER BY id desc 
+LIMIT 10;
 ```
