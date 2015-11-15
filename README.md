@@ -6,9 +6,9 @@ Powered by [hexo](https://github.com/hexojs/hexo).
 Hosted by GitHub for some custom adjustments.
 
 TODOs:
-- [X] Quick About page
-- [X] Add favicon (not compatible with Chrome, boo...)
 - [X] Show preview posts on Home page
 - [X] Clould Tag page setup
+- [X] Adjustable img size
+- [X] Comments
 - [ ] Google Analytics
 - [ ] 404 commonweal   
