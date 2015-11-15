@@ -10,5 +10,5 @@ TODOs:
 - [X] Clould Tag page setup
 - [X] Adjustable img size
 - [X] Comments
-- [ ] Google Analytics
+- [X] Google Analytics
 - [ ] 404 commonweal   

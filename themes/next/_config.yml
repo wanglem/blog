@@ -183,7 +183,7 @@ disqus_shortname: zeyangwang
 
 
 # Google Analytics
-#google_analytics:
+google_analytics: UA-26732808-3
 
 
 # Make duoshuo show UA
