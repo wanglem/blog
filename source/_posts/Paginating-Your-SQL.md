@@ -1,4 +1,4 @@
-title: Paginating Your Database - The Hard Way
+title: Paginating Your SQL - The Hard Way
 date: 2015-11-13 01:08:10
 tags:
   - mysql
