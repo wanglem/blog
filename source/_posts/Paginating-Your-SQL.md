@@ -58,7 +58,7 @@ Interestingly, the query time starts staying consistent when pacing towards the 
 
 
 Besides the obvious slowness issue, another major one is we might encounter data loss. For example, just before we load page 2 by running `limit 100, 100`, user "5" suddenly deleted, user "100" would be shifted to page 1, bad bad:
-{% img /2015/11/13/Paginating-Your-Database/data_loss_offset.png 500  "Data Loss from Hard Offsets"%}
+{% img /2015/11/13/Paginating-Your-SQL/data_loss_offset.png 500  "Data Loss from Hard Offsets"%}
 ## Improved Approach:
 ```sql Improved
 SELECT distinct uid 
@@ -134,7 +134,7 @@ From SQL explain result above, it's not a bad query at all. I'm a little suprise
 Note: Interestingly, filesort does not necessarily mean sort on disk, it more of any sort that is not using an index, and essentially by quicksort and mergesort. I guess it's just poorly named. See more in this [**article**](http://s.petrunia.net/blog/?p=24).
 
 Okay, so far so good. If we are working with a high volume of events, however, we could still encounter data loss. The reason is `created_on`, which is the timestamp field, is not unique. Therefore multiple followed topics with same created_on might be trunated from limit clause:
-{% img /2015/11/13/Paginating-Your-Database/data_loss_nonunique_ts.png 500  "Data Loss from Non-unique Timestamp"%}
+{% img /2015/11/13/Paginating-Your-SQL/data_loss_nonunique_ts.png 500  "Data Loss from Non-unique Timestamp"%}
 ## Filter by ID for more Uniqueness
 How about using PK(id) field? If we rely on the implication that the higher ID the closer created_on, we will have:
 
@@ -169,7 +169,7 @@ admin [tmp]>explain SELECT topic_id FROM followed_topics WHERE uid = 100 and id 
 
 ## Paging Inside a Pagination
 In a feed/timeline application, users would be likely to refresh page occasionally trying to pull latest posts, and scrolling all the way down to where they left off. Consider the following scenario:
-{% img /2015/11/13/Paginating-Your-Database/paging_in_pagination.png 300  "Duplicate Computation"%}
+{% img /2015/11/13/Paginating-Your-SQL/paging_in_pagination.png 300  "Duplicate Computation"%}
 
 As showing above, 1st request pulls down topic 5 - 1, and then topic 11 - 6 are generated; Then 2st request to pull latest 5 topics, which are 11 - 7; Then a 3rd request to continue pulling 6 - 2, with 3 overlapped topics re-computed.
 
