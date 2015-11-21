@@ -11,4 +11,5 @@ TODOs:
 - [X] Adjustable img size
 - [X] Comments
 - [X] Google Analytics
+- [X] Site Search
 - [ ] 404 commonweal   

@@ -6,7 +6,7 @@
 favicon: /favicon.ico
 
 # Set default keywords (Use a comma to separate)
-keywords: "Zeyang,Zeyang Blog,Zeyang Wang,Zeyang's Blog, Hexo"
+keywords: "zeyang,zeyang blog,zeyang Wang,zeyang's blog"
 
 # Set rss to false to disable feed link.
 # Leave rss as empty to use site's feed link.
@@ -156,11 +156,11 @@ use_font_lato: true
 # ---------------------------------------------------------------
 
 # MathJax Support
-mathjax:
+# mathjax:
 
 
 # Swiftype Search API Key
-#swiftype_key:
+swiftype_key: 4uYF53-U4pA7xisvJitW
 
 # Baidu Analytics ID
 #baidu_analytics:
