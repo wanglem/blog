@@ -19,7 +19,7 @@ Think of `Future[T]` is a *container* or a *tag* that wraps a piece of long last
 import concurrent.Future
 val promotion: Future[Title] = Future { 
 	// return your new title
-	new SeniorSoftwareEngineer
+	new CTO
 }
 
 promotion.onSuccess {
@@ -32,14 +32,14 @@ Also, to avoid the notorious callback hell problem, Scala provided multiple ways
 import concurrent.Future
 val promotion: Future[Double] = Future { 
 	// return your new title
-	new SeniorSoftwareEngineer
+	new CTO
 }
 
 val isPromoted: Future[Boolean] = promotion.map { x =>
 	// Whaaaaat? Are we in the future???
 	x match {
 		case t: Title => true
-		case _ => false // definitely should add some retry here
+		case _ => false
 	}
 }
 ```
@@ -50,7 +50,7 @@ def giveMePromo: Future[Title] = {
 	val bossPromise = Promise()
 	val promotion = Future {
 		wait(Duration(1, YEAR))
-		bossPromise.success(new SeniorSoftwareEngineer)
+		bossPromise.success(new CTO)
 	}
 	bossPromise.future
 }
@@ -66,7 +66,7 @@ def giveMePromo: Future[Title] = {
 	val bossPromise = Promise()
 	val promotion = Future {
 		wait(Duration(1, YEAR))
-		bossPromise.fail(Reason("too ugly."))
+		bossPromise.fail(Reason("too young too simple, sometimes naive"))
 	}
 	bossPromise.future
 }
